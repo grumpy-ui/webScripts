@@ -13,11 +13,6 @@ const ptfFinal = "%ptfFinal%";
 const scopOperatiune = "%scopOperatiune%";
 const tipOperatiune = "%tipOperatiune%";
 
-//For direct injection in console
-// const documentNumber = "v1230"
-// const partenerComercial ="Spirit Aerosystems Inc."
-// const numarVehicul = "mm123"
-
 //Save options for the dropdown menus
 const ptfFinalArray = [
   "Petea (HU)",
@@ -213,6 +208,7 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     notificareDropdownBtn.click();
     await wait(500); // Short wait for dropdown to appear
     documentTransportInput.value = documentNumber;
+    documentTransportInput.dispatchEvent(new Event("input", { bubbles: true }));
   } else {
     console.error("Document transport input not found");
   }
@@ -280,51 +276,61 @@ const selectPartner = async () => {
   return false;
 };
 
-(async () => {
-  const partnerSelected = await selectPartner();
+async function fillForm() {
+  (async () => {
+    const partnerSelected = await selectPartner();
+    const event = new Event("input", { bubbles: true });
 
-  if (partnerSelected) {
-    numarVehiculField.value = numarVehicul;
-    taraFinalField.value = "";
-    regiuneFinalField.value = "";
-    localitateFinalField.value = "";
-    stradaFinalField.value = "";
-    numarFinalField.value = "";
-    salveazaBtn.click();
-  } else {
-    console.error("Failed to select partner. Subsequent actions aborted.");
-  }
-})();
-
-const chooseDropDownValues = async () => {
-  selectDropDownValue(codDocumentDropDown, optionCodDocument);
-  selectDropDownValue(tipOperatiuneDropDown, optionTipOperatiune);
-  selectDropDownValue(scopOperatiuneDropDown, optionScopOperatiune);
-  selectDropDownValue(ptfFinalDropDown, optionPtf);
-  selectDropDownValue(birouVamalFinalDropDown, optionBirouVamal);
-  return true;
-};
-
-(async () => {
-  await chooseDropDownValues();
-})();
-
-//FUNCTIONS
-function selectDropDownValue(dropdownField, option) {
-  console.log(option);
-  if (dropdownField) {
-    if (option > -1) {
-      dropdownField.dispatchEvent(focusEventInputField);
-      dropdownField.dispatchEvent(clickEventInputField);
-
-      (async () => {
-        await wait(3000);
-        const options = document.querySelectorAll('button[role="option"]');
-        console.log("clicked: ", options[option]);
-        clickOption(options[option]);
-      })();
+    if (partnerSelected) {
+      numarVehiculField.value = numarVehicul;
+      taraFinalField.value = "";
+      regiuneFinalField.value = "";
+      localitateFinalField.value = "";
+      stradaFinalField.value = "";
+      numarFinalField.value = "";
+      numarVehiculField.dispatchEvent(event);
+      taraFinalField.dispatchEvent(event);
+      regiuneFinalField.dispatchEvent(event);
+      localitateFinalField.dispatchEvent(event);
+      stradaFinalField.dispatchEvent(event);
+      numarFinalField.dispatchEvent(event);
+      salveazaBtn.click();
+    } else {
+      console.error("Failed to select partner. Subsequent actions aborted.");
     }
-  } else {
-    console.error("Cod Document not found");
+  })();
+
+  const chooseDropDownValues = async () => {
+    selectDropDownValue(codDocumentDropDown, optionCodDocument);
+    selectDropDownValue(tipOperatiuneDropDown, optionTipOperatiune);
+    selectDropDownValue(scopOperatiuneDropDown, optionScopOperatiune);
+    selectDropDownValue(ptfFinalDropDown, optionPtf);
+    selectDropDownValue(birouVamalFinalDropDown, optionBirouVamal);
+  };
+
+  (async () => {
+    await chooseDropDownValues();
+  })();
+
+  //FUNCTIONS
+  function selectDropDownValue(dropdownField, option) {
+    console.log(option);
+    if (dropdownField) {
+      if (option > -1) {
+        dropdownField.dispatchEvent(focusEventInputField);
+        dropdownField.dispatchEvent(clickEventInputField);
+
+        (async () => {
+          await wait(3000);
+          const options = document.querySelectorAll('button[role="option"]');
+          console.log("clicked: ", options[option]);
+          clickOption(options[option]);
+        })();
+      }
+    } else {
+      console.error("Cod Document not found");
+    }
   }
 }
+
+fillForm();
